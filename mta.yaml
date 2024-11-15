@@ -11,6 +11,8 @@ build-parameters:
       commands:
         - npm ci
         - npx cds build --production
+        - npx cds deploy
+        - cp -r db.sqlite gen/srv
 modules:
   - name: bookshop-srv
     type: nodejs
@@ -27,7 +29,6 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: bookshop-auth
-      - name: bookshop-db
 
   - name: bookshop
     type: approuter.nodejs
@@ -88,14 +89,6 @@ modules:
       supported-platforms:
         []
 
-  - name: bookshop-db-deployer
-    type: hdb
-    path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
-    requires:
-      - name: bookshop-db
-
 resources:
   - name: bookshop-auth
     type: org.cloudfoundry.managed-service
@@ -104,7 +97,7 @@ resources:
       service-plan: application
       path: ./xs-security.json
       config:
-        xsappname: bookshop-${org}-${space}
+        xsappname: bookshop-pneudev-${space}
         tenant-mode: dedicated
 
   - name: bookshop-html5-repo-host
@@ -117,8 +110,4 @@ resources:
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
-  - name: bookshop-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
+
