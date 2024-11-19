@@ -17,7 +17,9 @@
     "@sap/cds-dk": "^8"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds-serve",
+    "deploy:sqlite": "cds deploy --to sqlite --with-mocks",
+    "deploy:cf": "cf deploy gen/mta.tar --delete-services"
   },
   "sapux": [
     "app/admin-books",

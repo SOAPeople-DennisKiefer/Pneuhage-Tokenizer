@@ -11,7 +11,7 @@ build-parameters:
       commands:
         - npm ci
         - npx cds build --production
-        - npx cds deploy
+        - npm run deploy:sqlite
         - cp -r db.sqlite gen/srv
 modules:
   - name: bookshop-srv
@@ -21,7 +21,7 @@ modules:
       buildpack: nodejs_buildpack
       readiness-health-check-type: http
       readiness-health-check-http-endpoint: /health
-      disk-quota: 512M
+      disk-quota: 1024M
       memory: 512M
     build-parameters:
       builder: npm
@@ -37,7 +37,7 @@ modules:
     path: app/router
     parameters:
       keep-existing-routes: true
-      disk-quota: 256M
+      disk-quota: 1024M
       memory: 256M
     requires:
       - name: srv-api
@@ -57,16 +57,16 @@ modules:
         parameters:
           content-target: true
     build-parameters:
-      build-result: app/
+      build-result: apps/
       requires:
-        - name: bookshopadminbooks
-          artifacts:
-            - admin-books.zip
-          target-path: app/
-        - name: bookshopbrowse
-          artifacts:
-            - browse.zip
-          target-path: app/
+      - artifacts:
+        - admin-books.zip
+        name: bookshopadminbooks
+        target-path: apps/
+      - artifacts:
+        - browse.zip
+        name: bookshopbrowse
+        target-path: apps/
 
   - name: bookshopadminbooks
     type: html5

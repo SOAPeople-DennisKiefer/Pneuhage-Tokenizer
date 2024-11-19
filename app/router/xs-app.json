@@ -1,15 +1,16 @@
 {
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "none",
   "routes": [
     {
-      "source": "^/app/(.*)$",
-      "target": "$1",
-      "localDir": ".",
-      "cacheControl": "no-cache, no-store, must-revalidate"
+      "source": "^/bookshopadminbooks/(.*)",
+      "target": "/bookshopadminbooks/$1",
+      "service": "html5-apps-repo-rt"
     },
     {
-      "source": "^/appconfig/",
-      "localDir": ".",
-      "cacheControl": "no-cache, no-store, must-revalidate"
+      "source": "^/browse/(.*)",
+      "target": "/bookshopbrowse/$1",
+      "service": "html5-apps-repo-rt"
     },
     {
       "source": "^/(.*)$",
