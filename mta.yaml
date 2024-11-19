@@ -67,6 +67,10 @@ modules:
         - browse.zip
         name: bookshopbrowse
         target-path: apps/
+      - artifacts:
+          - appconfig.zip
+        name: bookshopappconfig
+        target-path: apps/
 
   - name: bookshopadminbooks
     type: html5
@@ -90,6 +94,17 @@ modules:
         - npm run build
       supported-platforms:
         []
+  - name: bookshopappconfig
+    type: html5
+    path: app/appconfig
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - echo "Packaging static configuration files"
+        - mkdir -p dist
+        - zip -r dist/appconfig.zip . -i ./*
+      supported-platforms: []
 
 resources:
   - name: bookshop-auth

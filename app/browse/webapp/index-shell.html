@@ -8,7 +8,7 @@
       id="sap-ui-bootstrap"
       src="https://ui5.sap.com/1.130.0/resources/sap-ui-core.js"
       data-sap-ui-theme="sap_fiori_3"
-      data-sap-ui-libs="sap.m, sap.fe.core"
+      data-sap-ui-libs="sap.m, sap.ushell, sap.fe.core"
       data-sap-ui-compatVersion="edge"
       data-sap-ui-preload="async"
       data-sap-ui-onInit="module:sap/ui/core/ComponentSupport"
@@ -17,22 +17,17 @@
       }'
     ></script>
 
-    <!-- Specify the resource root for the Component -->
+    <!-- Initialize the SAP Fiori Elements app component -->
     <script>
-      // sap.ui.loader.config({
-      //   paths: {
-      //     "bookshop": "./"  // Relative path to your Component.js file
-      //   }
-      // });
-
       sap.ui.getCore().attachInit(function () {
-        sap.ui.require(["sap/ui/core/ComponentContainer"], function (ComponentContainer) {
-          new ComponentContainer({
+        // Create a new shell and place the ComponentContainer inside
+        new sap.m.Shell({
+          app: new sap.ui.core.ComponentContainer({
             name: "bookshop",
-            height: "100%",
-            manifestFirst: true
-          }).placeAt("content");
-        });
+            manifestFirst: true,
+            height: "100%"
+          })
+        }).placeAt("content");
       });
     </script>
   </head>

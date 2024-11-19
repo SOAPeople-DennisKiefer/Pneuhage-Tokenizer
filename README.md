@@ -12,6 +12,7 @@ For this, we need
 
 ## Architecture Overview
 ![External image from SAP - Architecture Overview](https://user-images.githubusercontent.com/7225881/199363555-10de43ac-80c9-493f-b849-b7675b7c1df3.png)
+(Source: https://github.com/SAP-samples/ui5-deployments/blob/main/README.md)
 
 ## Explanation of mta.yaml Parameters
 ### 1. build-result (in HTML5 Modules):
