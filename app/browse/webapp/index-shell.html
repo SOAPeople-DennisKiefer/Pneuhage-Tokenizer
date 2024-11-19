@@ -13,7 +13,7 @@
       data-sap-ui-preload="async"
       data-sap-ui-onInit="module:sap/ui/core/ComponentSupport"
       data-sap-ui-resource-roots='{
-        "bookshop": "./"
+        "bookshop.browse": "./"
       }'
     ></script>
 
@@ -23,7 +23,7 @@
         // Create a new shell and place the ComponentContainer inside
         new sap.m.Shell({
           app: new sap.ui.core.ComponentContainer({
-            name: "bookshop",
+            name: "bookshop.browse",  // Fully qualified ID from manifest.json
             manifestFirst: true,
             height: "100%"
           })
