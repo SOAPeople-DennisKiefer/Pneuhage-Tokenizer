@@ -64,7 +64,10 @@ For bookshopadminbooks:
 
 ### Final Access
 After deployment, the routes in xs-app.json will let users access the apps by going to URLs like:
-- ```https://<your-approuter-domain>/bookshopbrowse/index.html```
+- ```https://<your-approuter-domain>/browse/index.html```
 - ```https://<your-approuter-domain>/bookshopadminbooks/index.html```
 
 Each route points to the respective HTML5 app’s content in the HTML5 repository as configured by the name and target-path in the mta.yaml deployer module.
+
+The index.html (in the browse app) is a standalone app container that manages loading the required libs using the script from ./utils/locate-reuse-libs.js and then loads the component into the content area.
+There is also a Fiori Launchpad Sandbox available. For this, open the flpsandbox.html. Configuration for the FLP is managed in the browse project's ./appconfig folder. Access to this file is enabled in a dedicated Approuter route.
