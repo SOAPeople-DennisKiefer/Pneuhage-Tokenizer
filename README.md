@@ -62,12 +62,24 @@ For bookshopadminbooks:
 - target: Specifies the route in the HTML5 repository. /bookshopbrowse/$1 directs requests to the bookshopbrowse app's content in the HTML5 repository.
 - service: html5-apps-repo-rt is the HTML5 repository runtime service, allowing AppRouter to retrieve the app’s content.
 
-### Final Access
+## Deployment
+A full build and deployment cycle from the MTA descriptor can be done by running the script deploy:mta from the overall project's descriptor package.json. This will deploy the AppRouter and the two frontend apps.
+
+```bash
+npm run deploy:mta
+```
+
+## Accessing the App
 After deployment, the routes in xs-app.json will let users access the apps by going to URLs like:
 - ```https://<your-approuter-domain>/browse/index.html```
 - ```https://<your-approuter-domain>/bookshopadminbooks/index.html```
 
 Each route points to the respective HTML5 app’s content in the HTML5 repository as configured by the name and target-path in the mta.yaml deployer module.
 
+### Standalone App
 The index.html (in the browse app) is a standalone app container that manages loading the required libs using the script from ./utils/locate-reuse-libs.js and then loads the component into the content area.
+
+### Fiori Launchpad Sandbox
 There is also a Fiori Launchpad Sandbox available. For this, open the flpsandbox.html. Configuration for the FLP is managed in the browse project's ./appconfig folder. Access to this file is enabled in a dedicated Approuter route.
+
+Link to Launchpad: ```https://<your-approuter-domain>/browse/flpsandbox.html```
