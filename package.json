@@ -14,12 +14,15 @@
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.7.0",
-    "@sap/cds-dk": "^8"
+    "@sap/cds-dk": "^8",
+    "rimraf": "^6.0.1"
   },
   "scripts": {
     "start": "cds-serve",
+    "build:mta": "mbt build -t gen --mtar mta.tar",
     "deploy:sqlite": "cds deploy --to sqlite --with-mocks",
-    "deploy:cf": "cf deploy gen/mta.tar --delete-services"
+    "deploy:cf": "cf deploy gen/mta.tar --delete-services",
+    "deploy:mta": "npm run build:mta && npm run deploy:cf"
   },
   "sapux": [
     "app/admin-books",
