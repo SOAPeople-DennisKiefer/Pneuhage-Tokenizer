@@ -1,11 +1,17 @@
 {
   "welcomeFile": "/index.html",
-  "authenticationMethod": "none",
+  "authenticationMethod": "route",
   "routes": [
     {
       "source": "^/bookshopadminbooks/(.*)",
       "target": "/bookshopadminbooks/$1",
       "service": "html5-apps-repo-rt"
+    },
+    {
+      "source": "^/browse/odata/(.*)$",
+      "target": "/odata/$1",
+      "destination": "srv-api",
+      "csrfProtection": true
     },
     {
       "source": "^/browse/(.*)",

@@ -22,7 +22,7 @@ modules:
       readiness-health-check-type: http
       readiness-health-check-http-endpoint: /health
       disk-quota: 1024M
-      memory: 512M
+      memory: 256M
     build-parameters:
       builder: npm
     provides:

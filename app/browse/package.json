@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "webapp/index.html",
   "scripts": {
-    "build": "ui5 build preload --clean-dest --config ui5-deploy.yaml",
+    "build": "npm run clean && ui5 build preload --clean-dest --config ui5-deploy.yaml",
     "build-local": "ui5 build preload --clean-dest",
-    "start": "ui5 serve"
+    "start": "ui5 serve",
+    "clean": "echo 'Cleaning dist for UI.' && npx rimraf dist"
   },
   "devDependencies": {
     "@ui5/cli": "^4",
