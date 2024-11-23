@@ -1,0 +1,97 @@
+_schema-version: 3.3.0
+ID: pneuhage-tokenizer
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds deploy
+modules:
+  - name: pneuhage-tokenizer-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+      readiness-health-check-type: http
+      readiness-health-check-http-endpoint: /health
+      disk-quota: 512M
+      memory: 256M
+    build-parameters:
+      builder: npm
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: pneuhage-tokenizer-auth
+
+  - name: pneuhage-tokenizer
+    type: approuter.nodejs
+    path: app\router
+    parameters:
+      keep-existing-routes: true
+      disk-quota: 512M
+      memory: 256M
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api # must be used in xs-app.json as well
+          url: ~{srv-url}
+          forwardAuthToken: true
+      - name: pneuhage-tokenizer-auth
+
+  - name: depneuhagepneuhagetokenizer
+    type: html5
+    path: app/tokenizer
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm ci
+        - npm run build
+      supported-platforms:
+        []
+
+  - name: de-pneuhage-tokenizer-app-deployer
+    type: com.sap.application.content
+    path: gen
+    requires:
+      - name: de-pneuhage-tokenizer-html5-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: app/
+      requires:
+        - name: depneuhagepneuhagetokenizer
+          artifacts:
+            - fiori.zip
+          target-path: app/
+
+resources:
+  - name: pneuhage-tokenizer-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: pneuhage-tokenizer
+        tenant-mode: dedicated
+
+  - name: de-pneuhage-tokenizer-html5-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+      service-name: html5-apps-repo-hst
+
+  - name: de-pneuhage-tokenizer-html5-runtime
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime
