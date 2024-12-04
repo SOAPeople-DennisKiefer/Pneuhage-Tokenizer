@@ -9,7 +9,9 @@ build-parameters:
     - builder: custom
       commands:
         - npm ci
-        - npx cds deploy
+        - npx cds build --production
+        - npm run deploy:sqlite
+        - cp -r db.sqlite gen/srv
 modules:
   - name: pneuhage-tokenizer-srv
     type: nodejs
@@ -31,7 +33,7 @@ modules:
 
   - name: pneuhage-tokenizer
     type: approuter.nodejs
-    path: app\router
+    path: app/router
     parameters:
       keep-existing-routes: true
       disk-quota: 512M
@@ -44,8 +46,9 @@ modules:
           url: ~{srv-url}
           forwardAuthToken: true
       - name: pneuhage-tokenizer-auth
+      - name: de-pneuhage-tokenizer-html5-runtime
 
-  - name: depneuhagepneuhagetokenizer
+  - name: pneuhage-tokenizer-html5
     type: html5
     path: app/tokenizer
     build-parameters:
@@ -54,8 +57,6 @@ modules:
       commands:
         - npm ci
         - npm run build
-      supported-platforms:
-        []
 
   - name: de-pneuhage-tokenizer-app-deployer
     type: com.sap.application.content
@@ -67,7 +68,7 @@ modules:
     build-parameters:
       build-result: app/
       requires:
-        - name: depneuhagepneuhagetokenizer
+        - name: pneuhage-tokenizer-html5
           artifacts:
             - fiori.zip
           target-path: app/
@@ -80,7 +81,7 @@ resources:
       service-plan: application
       path: ./xs-security.json
       config:
-        xsappname: pneuhage-tokenizer
+        xsappname: pneuhage-tokenizer-${space}
         tenant-mode: dedicated
 
   - name: de-pneuhage-tokenizer-html5-repo-host

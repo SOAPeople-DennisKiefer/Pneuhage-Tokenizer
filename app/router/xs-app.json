@@ -1,15 +1,27 @@
 {
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
   "routes": [
     {
-      "source": "^/app/(.*)$",
-      "target": "$1",
-      "localDir": ".",
-      "cacheControl": "no-cache, no-store, must-revalidate"
+      "source": "^/pneuhagetokenizer/(.*)$",
+      "target": "/pneuhagetokenizer/$1",
+      "service": "html5-apps-repo-rt"
     },
     {
-      "source": "^/appconfig/",
-      "localDir": ".",
-      "cacheControl": "no-cache, no-store, must-revalidate"
+      "source": "^/tokenizer/odata/(.*)$",
+      "target": "/odata/$1",
+      "destination": "srv-api",
+      "csrfProtection": true
+    },
+    {
+      "source": "^/tokenizer/(.*)",
+      "target": "/pneuhagetokenizer/$1",
+      "service": "html5-apps-repo-rt"
+    },
+    {
+      "source": "^/appconfig/fioriSandboxConfig.json(.*)$",
+      "localDir": "/pneuhagetokenizer/appconfig/fioriSandboxConfig.json",
+      "service": "html5-apps-repo-rt"
     },
     {
       "source": "^/(.*)$",

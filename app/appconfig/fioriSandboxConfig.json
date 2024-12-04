@@ -1,0 +1,50 @@
+{
+    "services": {
+      "LaunchPage": {
+        "adapter": {
+          "config": {
+            "catalogs": [],
+            "groups": [],
+            "tiles": [
+              {
+                "id": "TokenizerTile",
+                "tileType": "sap.ushell.ui.tile.StaticTile",
+                "properties": {
+                  "title": "Tokenizer",
+                  "targetURL": "#APIKey-display"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "NavTargetResolution": {
+        "config": {
+          "enableClientSideTargetResolution": true
+        }
+      },
+      "ClientSideTargetResolution": {
+        "adapter": {
+          "config": {
+            "inbounds": {
+              "APIKey-display": {
+                "semanticObject": "APIKey",
+                "action": "display",
+                "title": "Tokenizer",
+                "signature": {
+                  "parameters": {},
+                  "additionalParameters": "allowed"
+                },
+                "resolutionResult": {
+                  "applicationType": "SAPUI5",
+                  "additionalInformation": "SAPUI5.Component=tokenizer",
+                  "url": "/tokenizer/webapp"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  

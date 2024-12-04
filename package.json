@@ -6,31 +6,40 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "@cap-js/sqlite": "^1",
     "@sap/cds": "^8",
-    "express": "^4",
     "@sap/xssec": "^4",
-    "@cap-js/sqlite": "^1"
+    "express": "^4",
+    "mbt": "^1.2.33"
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.7.0",
-    "@sap/cds-dk": "^8",
-    "@cap-js/sqlite": "^1"
+    "@cap-js/sqlite": "^1",
+    "@sap/cds-dk": "^8"
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-tokenizer": "cds watch --open tokenizer/webapp/index.html?sap-ui-xx-viewCache=false"
+    "build:mta": "mbt build -t gen --mtar mta.tar",
+    "deploy:sqlite": "cds deploy --to sqlite --with-mocks",
+    "deploy:cf": "cf deploy gen/mta.tar --delete-services",
+    "deploy:mta": "npm run build:mta && npm run deploy:cf"
   },
-  "cds": { 
+  "cds": {
     "requires": {
+      "[production]": {
+        "auth": "xsuaa"
+      },
+      "html5-repo": true,
       "db": {
         "kind": "sqlite",
-        "credentials": { "url": "db.sqlite" },
-        "schema_evolution": "auto"
+        "impl": "@cap-js/sqlite",
+        "credentials": {
+          "database": "db.sqlite"
+        }
       },
-      "auth": "dummy"
-    },
-    "server": {
-      "index": true
+      "features": {
+        "in_memory_db": true
+      }
     }
   },
   "sapux": [
