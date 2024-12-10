@@ -11,7 +11,7 @@ build-parameters:
         - npm ci
         - npx cds build --production
         - npm run deploy:sqlite
-        - cp -r db.sqlite gen/srv
+
 modules:
   - name: pneuhage-tokenizer-srv
     type: nodejs
@@ -20,7 +20,7 @@ modules:
       buildpack: nodejs_buildpack
       readiness-health-check-type: http
       readiness-health-check-http-endpoint: /health
-      disk-quota: 512M
+      disk-quota: 1024M
       memory: 256M
     build-parameters:
       builder: npm
@@ -36,7 +36,7 @@ modules:
     path: app/router
     parameters:
       keep-existing-routes: true
-      disk-quota: 512M
+      disk-quota: 1024M
       memory: 256M
     requires:
       - name: srv-api
@@ -46,7 +46,22 @@ modules:
           url: ~{srv-url}
           forwardAuthToken: true
       - name: pneuhage-tokenizer-auth
-      - name: de-pneuhage-tokenizer-html5-runtime
+      - name: pneuhage-tokenizer-html5-runtime
+
+  - name: pneuhage-tokenizer-app-deployer
+    type: com.sap.application.content
+    path: gen
+    requires:
+      - name: pneuhage-tokenizer-html5-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: dist # Removed trailing slash for consistency
+      requires:
+        - name: pneuhage-tokenizer-html5
+          artifacts:
+            - tokenizer.zip
+          target-path: dist/
 
   - name: pneuhage-tokenizer-html5
     type: html5
@@ -57,21 +72,9 @@ modules:
       commands:
         - npm ci
         - npm run build
-
-  - name: de-pneuhage-tokenizer-app-deployer
-    type: com.sap.application.content
-    path: gen
-    requires:
-      - name: de-pneuhage-tokenizer-html5-repo-host
-        parameters:
-          content-target: true
-    build-parameters:
-      build-result: app/
-      requires:
-        - name: pneuhage-tokenizer-html5
-          artifacts:
-            - fiori.zip
-          target-path: app/
+      overwrite: true
+    parameters:
+      memory: 512M
 
 resources:
   - name: pneuhage-tokenizer-auth
@@ -84,14 +87,13 @@ resources:
         xsappname: pneuhage-tokenizer-${space}
         tenant-mode: dedicated
 
-  - name: de-pneuhage-tokenizer-html5-repo-host
+  - name: pneuhage-tokenizer-html5-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
-      service-name: html5-apps-repo-hst
 
-  - name: de-pneuhage-tokenizer-html5-runtime
+  - name: pneuhage-tokenizer-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
