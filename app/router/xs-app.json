@@ -14,17 +14,17 @@
       "csrfProtection": true
     },
     {
-      "source": "^/tokenizer/(.*)",
+      "source": "^/tokenizer/(.*)$",
       "target": "/pneuhagetokenizer/$1",
       "service": "html5-apps-repo-rt"
     },
     {
-      "source": "^/appconfig/fioriSandboxConfig.json(.*)$",
-      "localDir": "/pneuhagetokenizer/appconfig/fioriSandboxConfig.json",
+      "source": "^/appconfig/fioriSandboxConfig.json$",
+      "target": "/pneuhagetokenizer/appconfig/fioriSandboxConfig.json",
       "service": "html5-apps-repo-rt"
     },
     {
-      "source": "^/(.*)$",
+      "source": "^(.*)$",
       "target": "$1",
       "destination": "srv-api",
       "csrfProtection": true

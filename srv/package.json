@@ -1,0 +1,17 @@
+{
+  "name": "srv",
+  "version": "1.0.0",
+  "main": "api-key-service.js",
+  "scripts": {
+  "start": "cds run",
+  "build": "cds build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@sap/cds": "^8.5.1",
+    "express": "^4.21.2"
+  }
+}
