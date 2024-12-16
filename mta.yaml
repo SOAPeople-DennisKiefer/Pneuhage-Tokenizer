@@ -22,10 +22,11 @@ modules:
       readiness-health-check-http-endpoint: /health
       disk-quota: 1024M
       memory: 256M
+      command: npm start
     build-parameters:
       builder: npm
     provides:
-      - name: srv-api # required by consumers of CAP services (e.g., approuter)
+      - name: srv-api # required by consumers of CAP services
         properties:
           srv-url: ${default-url}
     requires:
@@ -56,12 +57,12 @@ modules:
         parameters:
           content-target: true
     build-parameters:
-      build-result: dist
+      build-result: apps/
       requires:
         - name: pneuhage-tokenizer-html5
           artifacts:
             - tokenizer.zip
-          target-path: dist/
+          target-path: apps/
 
   - name: pneuhage-tokenizer-html5
     type: html5

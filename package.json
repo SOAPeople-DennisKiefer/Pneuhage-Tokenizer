@@ -6,10 +6,9 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
-    "@cap-js/sqlite": "^1.7.7",
+    "@cap-js/sqlite": "^1",
     "@sap/cds": "^8",
     "@sap/xssec": "^4",
-    "better-sqlite3": "^11.7.0",
     "express": "^4",
     "punycode": "^2.3.1",
     "sqlite3": "^5.1.7"
@@ -22,7 +21,7 @@
     "start": "cds-serve",
     "build:mta": "mbt build -t gen --mtar mta.tar",
     "deploy:sqlite": "cds deploy --to sqlite --with-mocks",
-    "deploy:cf": "npm install --no-fund --no-audit && cf deploy gen/mta.tar --delete-services",
+    "deploy:cf": "cf deploy gen/mta.tar --delete-services",
     "deploy:mta": "npm run build:mta && npm run deploy:cf"
   },
   "cds": {
