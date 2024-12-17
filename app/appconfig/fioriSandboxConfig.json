@@ -6,35 +6,18 @@
           "catalogs": [],
           "groups": [
             {
-              "id": "Bookshop",
-              "title": "Bookshop",
+              "id": "OrderbookAPIManager",
+              "title": "Orderbook API Manager",
               "isPreset": true,
               "isVisible": true,
               "isGroupLocked": false,
               "tiles": [
                 {
-                  "id": "BrowseBooks",
+                  "id": "APIKeys",
                   "tileType": "sap.ushell.ui.tile.StaticTile",
                   "properties": {
-                    "title": "Browse Books",
-                    "targetURL": "#Books-display"
-                  }
-                }
-              ]
-            },
-            {
-              "id": "Administration",
-              "title": "Administration",
-              "isPreset": true,
-              "isVisible": true,
-              "isGroupLocked": false,
-              "tiles": [
-                {
-                  "id": "ManageBooks",
-                  "tileType": "sap.ushell.ui.tile.StaticTile",
-                  "properties": {
-                    "title": "Manage Books",
-                    "targetURL": "#Books-manage"
+                    "title": "API Keys",
+                    "targetURL": "#APIKeys-manage"
                   }
                 }
               ]
@@ -52,39 +35,18 @@
       "adapter": {
         "config": {
           "inbounds": {
-            "BrowseBooks": {
-              "semanticObject": "Books",
-              "action": "display",
-              "title": "Browse Books",
-              "signature": {
-                "parameters": {
-                  "Books.ID": {
-                    "renameTo": "ID"
-                  },
-                  "Authors.books.ID": {
-                    "renameTo": "ID"
-                  }
-                },
-                "additionalParameters": "ignored"
-              },
-              "resolutionResult": {
-                "applicationType": "SAPUI5",
-                "additionalInformation": "SAPUI5.Component=bookshop",
-                "url": "browse/webapp"
-              }
-            },
-            "ManageBooks": {
-              "semanticObject": "Books",
+            "APIKeys": {
+              "semanticObject": "APIKeys",
               "action": "manage",
-              "title": "Manage Books",
+              "title": "Manage APIKeys",
               "signature": {
                 "parameters": {},
                 "additionalParameters": "allowed"
               },
               "resolutionResult": {
                 "applicationType": "SAPUI5",
-                "additionalInformation": "SAPUI5.Component=books",
-                "url": "admin-books/webapp"
+                "additionalInformation": "SAPUI5.Component=apikeys",
+                "url": "tokenizer/webapp"
               }
             }
           }

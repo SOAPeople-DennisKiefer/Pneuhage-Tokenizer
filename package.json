@@ -25,8 +25,7 @@
     "deploy:mta": "npm run build:mta && npm run deploy:cf"
   },
   "sapux": [
-    "app/admin-books",
-    "app/browse"
+    "app/tokenizer"
   ],
   "cds": {
     "requires": {

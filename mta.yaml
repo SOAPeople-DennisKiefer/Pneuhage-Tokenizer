@@ -1,5 +1,5 @@
 _schema-version: 3.3.0
-ID: bookshop
+ID: pneu-orderbook-apikey
 version: 1.0.0
 description: "A simple CAP project."
 parameters:
@@ -14,7 +14,7 @@ build-parameters:
         - npm run deploy:sqlite
         - cp -r db.sqlite gen/srv
 modules:
-  - name: bookshop-srv
+  - name: ob-apikey-srv
     type: nodejs
     path: gen/srv
     parameters:
@@ -30,9 +30,9 @@ modules:
         properties:
           srv-url: ${default-url}
     requires:
-      - name: bookshop-auth
+      - name: apikey-auth
 
-  - name: bookshop
+  - name: ob-apikey-ar
     type: approuter.nodejs
     path: app/router
     parameters:
@@ -46,43 +46,29 @@ modules:
           name: srv-api # must be used in xs-app.json as well
           url: ~{srv-url}
           forwardAuthToken: true
-      - name: bookshop-auth
-      - name: bookshop-html5-runtime
+      - name: apikey-auth
+      - name: apikey-html5-runtime
 
-  - name: bookshop-app-deployer
+  - name: apikey-app-deployer
     type: com.sap.application.content
     path: gen
     requires:
-      - name: bookshop-html5-repo-host
+      - name: apikey-html5-repo-host
         parameters:
           content-target: true
     build-parameters:
       build-result: apps/
       requires:
-      - artifacts:
-        - admin-books.zip
-        name: bookshopadminbooks
-        target-path: apps/
-      - artifacts:
-        - browse.zip
-        name: bookshopbrowse
-        target-path: apps/
+        - artifacts:
+            - tokenizer.zip
+          name: tokenizer
+          target-path: apps/
 
-  - name: bookshopadminbooks
+  - name: tokenizer
     type: html5
-    path: app/admin-books
+    path: app/tokenizer
     build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm ci
-        - npm run build
-      supported-platforms:
-        []
-  - name: bookshopbrowse
-    type: html5
-    path: app/browse
-    build-parameters:
+      overwrite: true
       build-result: dist
       builder: custom
       commands:
@@ -92,24 +78,23 @@ modules:
         []
 
 resources:
-  - name: bookshop-auth
+  - name: apikey-auth
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
       service-plan: application
       path: ./xs-security.json
       config:
-        xsappname: bookshop-pneudev-${space}
+        xsappname: apikey-pneudev-${space}
         tenant-mode: dedicated
 
-  - name: bookshop-html5-repo-host
+  - name: apikey-html5-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
-  - name: bookshop-html5-runtime
+  - name: apikey-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-runtime
-
