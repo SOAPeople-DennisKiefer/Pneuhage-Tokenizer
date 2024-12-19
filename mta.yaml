@@ -1,9 +1,10 @@
 _schema-version: 3.3.0
-ID: pneuhage-tokenizer
+ID: pneu-orderbook-apikey
 version: 1.0.0
 description: "A simple CAP project."
 parameters:
   enable-parallel-deployments: true
+  deploy_mode: html5-repo
 build-parameters:
   before-all:
     - builder: custom
@@ -13,7 +14,7 @@ build-parameters:
         - npm run deploy:sqlite
         - cp -r db.sqlite gen/srv
 modules:
-  - name: pneuhage-tokenizer-srv
+  - name: ob-apikey-srv
     type: nodejs
     path: gen/srv
     parameters:
@@ -22,17 +23,16 @@ modules:
       readiness-health-check-http-endpoint: /health
       disk-quota: 1024M
       memory: 256M
-      command: npm start
     build-parameters:
       builder: npm
     provides:
-      - name: srv-api # required by consumers of CAP services
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
         properties:
           srv-url: ${default-url}
     requires:
-      - name: pneuhage-tokenizer-auth
+      - name: apikey-auth
 
-  - name: pneuhage-tokenizer
+  - name: ob-apikey-ar
     type: approuter.nodejs
     path: app/router
     parameters:
@@ -46,54 +46,54 @@ modules:
           name: srv-api # must be used in xs-app.json as well
           url: ~{srv-url}
           forwardAuthToken: true
-      - name: pneuhage-tokenizer-auth
-      - name: pneuhage-tokenizer-html5-runtime
+      - name: apikey-auth
+      - name: apikey-html5-runtime
 
-  - name: pneuhage-tokenizer-app-deployer
+  - name: apikey-app-deployer
     type: com.sap.application.content
     path: gen
     requires:
-      - name: pneuhage-tokenizer-html5-repo-host
+      - name: apikey-html5-repo-host
         parameters:
           content-target: true
     build-parameters:
       build-result: apps/
       requires:
-        - name: pneuhage-tokenizer-html5
-          artifacts:
+        - artifacts:
             - tokenizer.zip
+          name: tokenizer
           target-path: apps/
 
-  - name: pneuhage-tokenizer-html5
+  - name: tokenizer
     type: html5
     path: app/tokenizer
     build-parameters:
+      overwrite: true
+      build-result: dist
       builder: custom
       commands:
         - npm ci
         - npm run build
-      build-result: dist
-      overwrite: true
-
+      supported-platforms:
+        []
 
 resources:
-  - name: pneuhage-tokenizer-auth
+  - name: apikey-auth
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
       service-plan: application
       path: ./xs-security.json
       config:
-        xsappname: pneuhage-tokenizer-${space}
+        xsappname: apikey-pneudev-${space}
         tenant-mode: dedicated
 
-  - name: pneuhage-tokenizer-html5-repo-host
+  - name: apikey-html5-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
-
-  - name: pneuhage-tokenizer-html5-runtime
+  - name: apikey-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo

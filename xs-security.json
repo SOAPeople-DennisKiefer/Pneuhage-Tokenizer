@@ -1,10 +1,19 @@
 {
-  "scopes": [],
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.admin",
+      "description": "admin"
+    }
+  ],
   "attributes": [],
-  "role-templates": [],
-  "oauth2-configuration": {
-    "redirect-uris": [
-      "https://*.eu10.hana.ondemand.com/**"
-    ]
-  }
+  "role-templates": [
+    {
+      "name": "admin",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.admin"
+      ],
+      "attribute-references": []
+    }
+  ]
 }

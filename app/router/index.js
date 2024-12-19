@@ -1,8 +1,8 @@
 var approuter = require('@sap/approuter');
 var ar = approuter();
 
-ar.beforeRequestHandler.use('/tokenizer/odata', function (req, res, next) {
-    console.log("Accessing odata endpoint for app 'tokenizer'");
+ar.beforeRequestHandler.use('/browse/odata', function (req, res, next) {
+    console.log("Accessing odata endpoint for app 'browse'");
     next();
 });
 

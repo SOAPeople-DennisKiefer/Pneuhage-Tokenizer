@@ -1,5 +1,5 @@
 {
-  "name": "pneuhage-tokenizer",
+  "name": "bookshop",
   "version": "1.0.0",
   "description": "A simple CAP project.",
   "repository": "<Add your repository here>",
@@ -10,12 +10,12 @@
     "@sap/cds": "^8",
     "@sap/xssec": "^4",
     "express": "^4",
-    "punycode": "^2.3.1",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.7.0",
-    "@sap/cds-dk": "^8"
+    "@sap/cds-dk": "^8",
+    "rimraf": "^6.0.1"
   },
   "scripts": {
     "start": "cds-serve",
@@ -24,6 +24,9 @@
     "deploy:cf": "cf deploy gen/mta.tar --delete-services",
     "deploy:mta": "npm run build:mta && npm run deploy:cf"
   },
+  "sapux": [
+    "app/tokenizer"
+  ],
   "cds": {
     "requires": {
       "[production]": {
@@ -41,11 +44,5 @@
         "in_memory_db": true
       }
     }
-  },
-  "sapux": [
-    "app/tokenizer"
-  ],
-  "fiori": {
-    "preview": true
   }
 }

@@ -1,4 +1,4 @@
-# CAP pneuhage-tokenizer
+# CAP bookshop
 _out
 *.db
 *.sqlite
@@ -8,6 +8,7 @@ default-*.json
 gen/
 node_modules/
 target/
+dist/
 
 # Web IDE, App Studio
 .che/
