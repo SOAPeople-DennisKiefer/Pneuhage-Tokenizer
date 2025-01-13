@@ -9,7 +9,9 @@
     "@cap-js/sqlite": "^1",
     "@sap/cds": "^8",
     "@sap/xssec": "^4",
+    "dotenv": "^16.4.7",
     "express": "^4",
+    "express-basic-auth": "^1.2.1",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
@@ -32,6 +34,7 @@
       "[production]": {
         "auth": "xsuaa"
       },
+      
       "html5-repo": true,
       "db": {
         "kind": "sqlite",

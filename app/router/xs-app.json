@@ -9,7 +9,7 @@
     },
     {
       "source": "^/appconfig/fioriSandboxConfig.json(.*)$",
-      "target": "/bookshopbrowse/appconfig/fioriSandboxConfig.json",
+      "target": "/app/appconfig/fioriSandboxConfig.json",
       "service": "html5-apps-repo-rt"
     },
     {

@@ -17,7 +17,7 @@
                   "tileType": "sap.ushell.ui.tile.StaticTile",
                   "properties": {
                     "title": "API Keys",
-                    "targetURL": "#APIKeys-manage"
+                    "targetURL": "tokenizer/webapp"
                   }
                 }
               ]
