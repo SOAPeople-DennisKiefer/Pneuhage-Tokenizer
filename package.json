@@ -31,8 +31,8 @@
   ],
   "cds": {
     "requires": {
-      "[production]": {
-        "auth": "xsuaa"
+      "auth": {
+        "kind": "dummy"
       },
       
       "html5-repo": true,
@@ -46,6 +46,9 @@
       "features": {
         "in_memory_db": true
       }
+    },
+    "auth": {
+      "passport": false
     }
   }
 }
