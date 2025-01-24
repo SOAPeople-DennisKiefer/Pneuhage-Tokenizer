@@ -31,10 +31,7 @@
   ],
   "cds": {
     "requires": {
-      "auth": {
-        "kind": "dummy"
-      },
-      
+      "auth": "xsuaa",
       "html5-repo": true,
       "db": {
         "kind": "sqlite",

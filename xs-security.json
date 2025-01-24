@@ -1,19 +1,22 @@
 {
+  "xsappname": "pneuhage-tokenizer",
+  "tenant-mode": "dedicated",
   "scopes": [
     {
-      "name": "$XSAPPNAME.admin",
-      "description": "admin"
+      "name": "$XSAPPNAME.Viewer",
+      "description": "Access for internal services",
+      "grant-as-authority-to-apps": ["sb-orderbook-api!t86855"]
     }
   ],
-  "attributes": [],
   "role-templates": [
     {
-      "name": "admin",
-      "description": "generated",
-      "scope-references": [
-        "$XSAPPNAME.admin"
-      ],
-      "attribute-references": []
+      "name": "Viewer",
+      "description": "Viewer role",
+      "scope-references": ["$XSAPPNAME.Viewer"]
     }
+  ],
+  "authorities": [
+    "$XSAPPNAME.Viewer"
   ]
 }
+
