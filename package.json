@@ -12,6 +12,7 @@
     "dotenv": "^16.4.7",
     "express": "^4",
     "express-basic-auth": "^1.2.1",
+    "passport": "^0.7.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
@@ -45,7 +46,7 @@
       }
     },
     "auth": {
-      "passport": false
+      "passport": true
     }
   }
 }

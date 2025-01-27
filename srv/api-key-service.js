@@ -4,6 +4,7 @@ require('dotenv').config(); // Load environment variables
 // Global Middleware for All Incoming Requests
 cds.on('bootstrap', (app) => {
   app.use((req, res, next) => {
+    console.log(req.headers);
     console.log(`[DEBUG] Global Middleware - Request Path: ${req.path}`);
     console.log(`[DEBUG] Authorization Header: ${req.headers['authorization']}`);
     console.log(`[DEBUG] x-api-key Header: ${req.headers['x-api-key']}`);
@@ -16,42 +17,18 @@ module.exports = class APIKeyService extends cds.ApplicationService {
   async init() {
     const { APIKeys } = this.entities;
 
-    // Middleware to handle Basic Authentication for specific events
     this.before(['generateAPIKey', 'validateAPIKey'], async (req) => {
       console.log(`[DEBUG] Middleware triggered for event: ${req.event}, path: ${req.path}`);
 
-      const authHeader = req.headers['authorization'];
-      console.log(`[DEBUG] Authorization Header: ${authHeader}`);
-
-      if (!authHeader || !authHeader.startsWith('Basic ')) {
-        console.log('[DEBUG] Missing or malformed Authorization Header');
+      // Prüfe, ob ein User-Objekt vorhanden ist (=> JWT erfolgreich validiert).
+      if (!req.user) {
+        console.log('[DEBUG] No JWT user found -> rejecting');
         return req.reject(401, {
           error: 'Unauthorized',
-          message: 'Missing or malformed Basic Authentication header',
+          message: 'Missing or invalid JWT token',
         });
       }
-
-      const base64Credentials = authHeader.split(' ')[1];
-      const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
-      const [username, password] = credentials.split(':');
-
-      console.log(`[DEBUG] Decoded Username: ${username}`);
-      console.log(`[DEBUG] Decoded Password: ${password}`);
-      console.log(`[DEBUG] Expected Username: ${process.env.TOKENIZER_USER}`);
-      console.log(`[DEBUG] Expected Password: ${process.env.TOKENIZER_PASS}`);
-
-      if (
-        username.trim() !== process.env.TOKENIZER_USER?.trim() ||
-        password.trim() !== process.env.TOKENIZER_PASS?.trim()
-      ) {
-        console.log('[DEBUG] Invalid Credentials');
-        return req.reject(401, {
-          error: 'Unauthorized',
-          message: 'Invalid Credentials',
-        });
-      }
-
-      console.log('[DEBUG] Authentication successful!');
+      console.log('[DEBUG] JWT authentication successful!');
     });
 
     // API-Key generation handler
@@ -76,11 +53,11 @@ module.exports = class APIKeyService extends cds.ApplicationService {
       }
     });
 
-    // API-Key validation handler
+    // API-Key validation handler (jetzt JWT-geschützt)
     this.on('validateAPIKey', async (req) => {
       console.log('[DEBUG] validateAPIKey handler triggered');
 
-      const apiKey = req.headers['x-api-key']; // Expect API Key in the header
+      const apiKey = req.headers['x-api-key'];
       console.log(`[DEBUG] Received API Key: ${apiKey}`);
 
       if (!apiKey) {

@@ -30,7 +30,7 @@ modules:
         properties:
           srv-url: ${default-url}
     requires:
-      - name: apikey-auth
+      - name: orderbookapi-xsuaa
 
   - name: ob-apikey-ar
     type: approuter.nodejs
@@ -46,7 +46,7 @@ modules:
           name: srv-api # must be used in xs-app.json as well
           url: ~{srv-url}
           forwardAuthToken: true
-      - name: apikey-auth
+      - name: orderbookapi-xsuaa
       - name: apikey-html5-runtime
 
   - name: apikey-app-deployer
@@ -78,15 +78,12 @@ modules:
         []
 
 resources:
-  - name: apikey-auth
+  - name: orderbookapi-xsuaa
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
       service-plan: application
-      path: ./xs-security.json
-      config:
-        xsappname: apikey-pneudev-${space}
-        tenant-mode: dedicated
+      service-name: orderbookapi-xsuaa
 
   - name: apikey-html5-repo-host
     type: org.cloudfoundry.managed-service
