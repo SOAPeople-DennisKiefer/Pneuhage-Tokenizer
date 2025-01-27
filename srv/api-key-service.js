@@ -4,10 +4,13 @@ require('dotenv').config(); // Load environment variables
 // Global Middleware for All Incoming Requests
 cds.on('bootstrap', (app) => {
   app.use((req, res, next) => {
-    console.log(req.headers);
-    console.log(`[DEBUG] Global Middleware - Request Path: ${req.path}`);
-    console.log(`[DEBUG] Authorization Header: ${req.headers['authorization']}`);
-    console.log(`[DEBUG] x-api-key Header: ${req.headers['x-api-key']}`);
+    // DEBUG Logs for local usage.
+    if (process.env.PLATFORM === 'LOCAL') {
+      console.log(req.headers);
+      console.log(`[DEBUG] Global Middleware - Request Path: ${req.path}`);
+      console.log(`[DEBUG] Authorization Header: ${req.headers['authorization']}`);
+      console.log(`[DEBUG] x-api-key Header: ${req.headers['x-api-key']}`);
+    }
     next();
   });
 });
@@ -18,17 +21,23 @@ module.exports = class APIKeyService extends cds.ApplicationService {
     const { APIKeys } = this.entities;
 
     this.before(['generateAPIKey', 'validateAPIKey'], async (req) => {
-      console.log(`[DEBUG] Middleware triggered for event: ${req.event}, path: ${req.path}`);
+      if (process.env.PLATFORM === 'LOCAL') {
+        console.log(`[DEBUG] Middleware triggered for event: ${req.event}, path: ${req.path}`);
+      }
 
       // Prüfe, ob ein User-Objekt vorhanden ist (=> JWT erfolgreich validiert).
       if (!req.user) {
-        console.log('[DEBUG] No JWT user found -> rejecting');
+        if (process.env.PLATFORM === 'LOCAL') {
+          console.log('[DEBUG] No JWT user found -> rejecting');
+        }
         return req.reject(401, {
           error: 'Unauthorized',
           message: 'Missing or invalid JWT token',
         });
       }
-      console.log('[DEBUG] JWT authentication successful!');
+      if (process.env.PLATFORM === 'LOCAL') {
+        console.log('[DEBUG] JWT authentication successful!');
+      }
     });
 
     // API-Key generation handler
@@ -55,10 +64,14 @@ module.exports = class APIKeyService extends cds.ApplicationService {
 
     // API-Key validation handler (jetzt JWT-geschützt)
     this.on('validateAPIKey', async (req) => {
-      console.log('[DEBUG] validateAPIKey handler triggered');
+      if (process.env.PLATFORM === 'LOCAL') {
+        console.log('[DEBUG] validateAPIKey handler triggered');
+      }
 
       const apiKey = req.headers['x-api-key'];
-      console.log(`[DEBUG] Received API Key: ${apiKey}`);
+      if (process.env.PLATFORM === 'LOCAL') {
+        console.log(`[DEBUG] Received API Key: ${apiKey}`);
+      }
 
       if (!apiKey) {
         req.error(400, 'Missing or invalid API Key in the header');
@@ -70,7 +83,9 @@ module.exports = class APIKeyService extends cds.ApplicationService {
           .where({ apiKey: apiKey });
 
         if (result) {
-          console.log('[DEBUG] API Key valid');
+          if (process.env.PLATFORM === 'LOCAL') {
+            console.log('[DEBUG] API Key valid');
+          }
           return {
             valid: true,
             debitor: result.debitor,
@@ -78,11 +93,15 @@ module.exports = class APIKeyService extends cds.ApplicationService {
             createdAt: result.createdAt,
           };
         } else {
-          console.log('[DEBUG] Invalid API Key');
+          if (process.env.PLATFORM === 'LOCAL') {
+            console.log('[DEBUG] Invalid API Key');
+          }
           req.error(401, 'Invalid API Key');
         }
       } catch (err) {
-        console.error('[DEBUG] Error during API Key validation:', err);
+        if (process.env.PLATFORM === 'LOCAL') {
+          console.error('[DEBUG] Error during API Key validation:', err);
+        }
         req.error(500, 'Unexpected error while validating API Key');
       }
     });
