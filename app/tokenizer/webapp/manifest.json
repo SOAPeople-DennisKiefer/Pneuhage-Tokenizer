@@ -125,22 +125,23 @@
               "controlConfiguration": {
                 "@com.sap.vocabularies.UI.v1.LineItem": {
                   "tableSettings": {
-                    "type": "AnalyticalTable",
-                    "condensedTableLayout": true,
-                    "selectionMode": "None",
+                    "type": "ResponsiveTable",
+                    "condensedTableLayout": false,
+                    "selectionMode": "Single",
                     "widthIncludingColumnHeader": true,
                     "personalization": {
                       "column": false,
                       "filter": true,
-                      "sort": false
+                      "sort": true
                     },
-                    "disableCopyToClipboard": false,
+                    "disableCopyToClipboard": true,
                     "enableExport": false,
                     "selectAll": false,
                     "quickVariantSelection": {
                       "hideTableTitle": false,
                       "showCounts": false
-                    }
+                    },
+                    "selectionLimit": 1
                   },
                   "columns": {
                     "DataField::apiKey": {

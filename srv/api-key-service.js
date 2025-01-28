@@ -1,46 +1,18 @@
 const cds = require('@sap/cds');
 require('dotenv').config(); // Load environment variables
 
-// Global Middleware for All Incoming Requests
-cds.on('bootstrap', (app) => {
-  app.use((req, res, next) => {
-    // DEBUG Logs for local usage.
-    if (process.env.PLATFORM === 'LOCAL') {
-      console.log(req.headers);
-      console.log(`[DEBUG] Global Middleware - Request Path: ${req.path}`);
-      console.log(`[DEBUG] Authorization Header: ${req.headers['authorization']}`);
-      console.log(`[DEBUG] x-api-key Header: ${req.headers['x-api-key']}`);
-    }
-    next();
-  });
-});
-
-// Main service definition
 module.exports = class APIKeyService extends cds.ApplicationService {
   async init() {
     const { APIKeys } = this.entities;
 
-    this.before(['generateAPIKey', 'validateAPIKey'], async (req) => {
-      if (process.env.PLATFORM === 'LOCAL') {
-        console.log(`[DEBUG] Middleware triggered for event: ${req.event}, path: ${req.path}`);
-      }
-
-      // Prüfe, ob ein User-Objekt vorhanden ist (=> JWT erfolgreich validiert).
-      if (!req.user) {
-        if (process.env.PLATFORM === 'LOCAL') {
-          console.log('[DEBUG] No JWT user found -> rejecting');
-        }
-        return req.reject(401, {
-          error: 'Unauthorized',
-          message: 'Missing or invalid JWT token',
-        });
-      }
-      if (process.env.PLATFORM === 'LOCAL') {
-        console.log('[DEBUG] JWT authentication successful!');
-      }
+    // Hook vor dem Anlegen eines neuen Eintrags, um API-Key zu generieren
+    this.before('CREATE', APIKeys, async (req) => {
+      req.data.ID = cds.utils.uuid(); // Eindeutige ID setzen
+      req.data.apiKey = this._generateRandomAPIKey(); // Direkt API Key generieren
+      req.data.createdAt = new Date(); // Timestamp setzen
     });
 
-    // API-Key generation handler
+    // API-Key generation handler (manuelles Anlegen über Event)
     this.on('generateAPIKey', async (req) => {
       const apiKey = this._generateRandomAPIKey();
 
@@ -62,7 +34,7 @@ module.exports = class APIKeyService extends cds.ApplicationService {
       }
     });
 
-    // API-Key validation handler (jetzt JWT-geschützt)
+    // API-Key validation handler (JWT-geschützt)
     this.on('validateAPIKey', async (req) => {
       if (process.env.PLATFORM === 'LOCAL') {
         console.log('[DEBUG] validateAPIKey handler triggered');
