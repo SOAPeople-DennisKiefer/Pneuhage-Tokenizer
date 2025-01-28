@@ -18,11 +18,9 @@ This project provides an **API key management system** that allows users to:
 
 ---
 
-## 📂 Documentation Overview
-- [Architecture](#-architecture-overview) - Learn about the backend & frontend structure
-- [API Reference](#-api-reference) - Endpoints, requests, and responses
-- [Usage](#-how-to-use-the-application) - How to interact with the application
-
-📢 **Feedback & Contributions:** Open an issue on GitHub! 🛠️
+## 📖 Table of Contents
+- [Architecture](architecture.md)
+- [Usage Guide](usage.md)
+- [API Reference](api-reference.md)
 
 ---
