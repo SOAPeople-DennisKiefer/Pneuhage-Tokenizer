@@ -82,6 +82,7 @@ resources:
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
+      tenantmode: dedicated
       service-plan: application
       service-name: orderbookapi-xsuaa
 

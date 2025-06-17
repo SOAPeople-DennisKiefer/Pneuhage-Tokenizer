@@ -11,7 +11,7 @@
 4. The API key is generated **automatically** 🔑
 
 ## 3️⃣ Validate an API Key
-- Call the **`/api/validateAPIKey`** endpoint with a key in the header.
+- Call the **`/api/validateAPIKey`** endpoint with a key in the header. The token must be in the header field "x-api-key"
 - If valid, the API returns `{ valid: true }`
 
 ## 4️⃣ Debugging & Logs

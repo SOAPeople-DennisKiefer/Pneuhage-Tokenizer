@@ -25,14 +25,14 @@
     "build:mta": "mbt build -t gen --mtar mta.tar",
     "deploy:sqlite": "cds deploy --to sqlite --with-mocks",
     "deploy:cf": "cf deploy gen/mta.tar --delete-services",
-    "deploy:mta": "npm run build:mta && npm run deploy:cf"
+    "deploy:mta": "cds build && npm run deploy:sqlite && npm run build:mta && npm run deploy:cf"
   },
   "sapux": [
     "app/tokenizer"
   ],
   "cds": {
     "requires": {
-      "auth": "xsuaa",
+      "auth": "dummy",
       "html5-repo": true,
       "db": {
         "kind": "sqlite",
@@ -43,7 +43,12 @@
       },
       "features": {
         "in_memory_db": true
+      },
+      "[production]": {
+      "requires": {
+        "auth": "xsuaa"
       }
+    }
     },
     "auth": {
       "passport": true
