@@ -6,20 +6,20 @@
       "source": "^/apikey/(.*)",
       "target": "/tokenizer/$1",
       "service": "html5-apps-repo-rt",
-      "authenticationType": "xsuaa"
+      "authenticationType": "none"
     },
     {
       "source": "^/appconfig/fioriSandboxConfig.json(.*)$",
       "target": "/app/appconfig/fioriSandboxConfig.json",
       "service": "html5-apps-repo-rt",
-      "authenticationType": "xsuaa"
+      "authenticationType": "none"
     },
     {
       "source": "^/(.*)$",
       "target": "/$1",
       "destination": "srv-api",
       "csrfProtection": true,
-      "authenticationType": "xsuaa"
+      "authenticationType": "none"
     }
   ]
 }
