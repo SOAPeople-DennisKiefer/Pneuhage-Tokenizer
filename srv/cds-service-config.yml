@@ -1,0 +1,12 @@
+# Diese Datei wird von CAP nur im Service-Modul geladen (Deployment-Umgebung).
+
+# Deaktiviert die Draft-Funktionalität für alle Services in diesem Modul,
+# falls sie in der CDS-Datei über `@odata.draft.enabled` aktiviert wurde.
+# Dies verhindert den Versuch, die nicht-existierenden Draft-Tabellen abzufragen.
+cds:
+  features:
+    draft: false
+
+# Falls Draft für bestimmte Entitäten dennoch benötigt wird,
+# kann dies spezifischer auf den Service oder die Entität angewendet werden.
+# Hier gehen wir davon aus, dass Draft für den APIKeyService nicht benötigt wird.

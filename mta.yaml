@@ -5,15 +5,42 @@ description: "A simple CAP project."
 parameters:
   enable-parallel-deployments: true
   deploy_mode: html5-repo
+
 build-parameters:
   before-all:
     - builder: custom
       commands:
         - npm ci
         - npx cds build --production
-        - npm run deploy:sqlite
-        - cp -r db.sqlite gen/srv
+        # HIER WURDEN DIE ALTEN SQLITE-BEFEHLE ENTFERNT!
+
 modules:
+  # NEUES MODUL: DB Deployment (mit type: nodejs für PostgreSQL)
+  - name: ob-apikey-db
+    type: nodejs # Zurück zu nodejs
+    path: srv # WICHTIG: Ändere den Pfad auf das SOURCE-Verzeichnis
+    parameters:
+      # Definiert, dass dieses Modul nur die Migration durchführen soll
+      cds.deploy.config: 
+        kind: deploy-only
+        service: orderbookapi-db
+      disk-quota: 256M
+      memory: 256M
+      buildpack: nodejs_buildpack # Expliziter Buildpack-Hint
+    build-parameters:
+      # WICHTIG: Wir verwenden einen CUSTOM Builder, um das vollständige NPM-Install
+      # zu überspringen und nur die notwendigen Dateien zu kopieren.
+      builder: custom
+      commands:
+        - "npm prune --production" # Entfernt devDependencies
+        - "npm install --production" # Stellt nur Produktionsabhängigkeiten sicher
+      # Wir ignorieren nur, was wir nicht brauchen.
+      ignore: ["db/**", "app/**", "test/**"] # Ignoriere die Datenbank- und App-Quellen
+      
+    requires:
+      - name: orderbookapi-db # Bindet die PostgreSQL-Resource, um die Migration durchzuführen
+
+  # SERVICE-MODUL (Startet NUR den Service, keine Migration mehr!)
   - name: ob-apikey-srv
     type: nodejs
     path: gen/srv
@@ -26,11 +53,15 @@ modules:
     build-parameters:
       builder: npm
     provides:
-      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+      - name: srv-api # required by consumers of CAP services (e.e. approuter)
         properties:
           srv-url: ${default-url}
     requires:
       - name: orderbookapi-xsuaa
+      # WICHTIG: Service ist nun vom DB-Modul abhängig, um sicherzustellen,
+      # dass die Migration abgeschlossen ist, bevor der Service startet.
+      - name: orderbookapi-db 
+      - name: ob-apikey-db # Stellt sicher, dass das DB-Modul zuerst deployt wird!
 
   - name: ob-apikey-ar
     type: approuter.nodejs
@@ -78,6 +109,13 @@ modules:
         []
 
 resources:
+  # NEUE RESOURCE: Verweist auf die existierende PostgreSQL-Instanz in der BTP
+  - name: orderbookapi-db
+    type: org.cloudfoundry.existing-service
+    parameters:
+      # Die Instanz heißt "tokenizer-db"
+      service-name: tokenizer-db
+
   - name: orderbookapi-xsuaa
     type: org.cloudfoundry.managed-service
     parameters:

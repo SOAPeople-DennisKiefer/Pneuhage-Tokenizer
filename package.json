@@ -6,52 +6,61 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
-    "@cap-js/sqlite": "^1",
+    "@cap-js/postgres": "^1.14.2",
     "@sap/cds": "^8",
     "@sap/xssec": "^4",
     "dotenv": "^16.4.7",
     "express": "^4",
     "express-basic-auth": "^1.2.1",
-    "passport": "^0.7.0",
-    "sqlite3": "^5.1.7"
+    "passport": "^0.7.0"
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.7.0",
     "@sap/cds-dk": "^8",
-    "rimraf": "^6.0.1"
+    "@cap-js/sqlite": "^1",
+    "rimraf": "^6.0.1",
+    "sqlite3": "^5"
   },
   "scripts": {
     "start": "cds-serve",
+    "db:init:local": "npx cds deploy --to pg --with-mocks",
+    "start:local": "cds run",
     "build:mta": "mbt build -t gen --mtar mta.tar",
     "deploy:sqlite": "cds deploy --to sqlite --with-mocks",
-    "deploy:cf": "cf deploy gen/mta.tar --delete-services",
-    "deploy:mta": "cds build && npm run deploy:sqlite && npm run build:mta && npm run deploy:cf"
+    "deploy:cf": "cf deploy gen/mta.tar",
+    "build": "cds build --production",
+    "deploy:cf:update": "npm run build && npm run build:mta && npm run deploy:cf"
   },
   "sapux": [
     "app/tokenizer"
   ],
   "cds": {
     "requires": {
-      "auth": "dummy",
-      "html5-repo": true,
       "db": {
-        "kind": "sqlite",
-        "impl": "@cap-js/sqlite",
-        "credentials": {
-          "database": "db.sqlite"
+        "kind": "sql",
+        "adapter": "pg",
+        "deployment": "@cap-js/postgres",
+        "model": [
+          "db",
+          "srv"
+        ],
+        "production": {
+          "adapter": "pg"
+        },
+        "development": {
+          "adapter": "pg",
+          "credentials": {
+            "host": "localhost",
+            "port": 5432,
+            "user": "localuser",
+            "password": "localpassword",
+            "database": "localdb"
+          }
         }
       },
-      "features": {
-        "in_memory_db": true
-      },
-      "[production]": {
-      "requires": {
-        "auth": "xsuaa"
+      "auth": {
+        "passport": true
       }
-    }
-    },
-    "auth": {
-      "passport": true
     }
   }
 }
