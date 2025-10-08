@@ -1,0 +1,121 @@
+                                   List of relations
+       Schema       |                  Name                   |    Type     |  Owner   
+--------------------+-----------------------------------------+-------------+----------
+ information_schema | sql_features                            | table       | rdsadmin
+ information_schema | sql_implementation_info                 | table       | rdsadmin
+ information_schema | sql_parts                               | table       | rdsadmin
+ information_schema | sql_sizing                              | table       | rdsadmin
+ pg_catalog         | pg_aggregate                            | table       | rdsadmin
+ pg_catalog         | pg_am                                   | table       | rdsadmin
+ pg_catalog         | pg_amop                                 | table       | rdsadmin
+ pg_catalog         | pg_amproc                               | table       | rdsadmin
+ pg_catalog         | pg_attrdef                              | table       | rdsadmin
+ pg_catalog         | pg_attribute                            | table       | rdsadmin
+ pg_catalog         | pg_auth_members                         | table       | rdsadmin
+ pg_catalog         | pg_authid                               | table       | rdsadmin
+ pg_catalog         | pg_cast                                 | table       | rdsadmin
+ pg_catalog         | pg_class                                | table       | rdsadmin
+ pg_catalog         | pg_collation                            | table       | rdsadmin
+ pg_catalog         | pg_constraint                           | table       | rdsadmin
+ pg_catalog         | pg_conversion                           | table       | rdsadmin
+ pg_catalog         | pg_database                             | table       | rdsadmin
+ pg_catalog         | pg_db_role_setting                      | table       | rdsadmin
+ pg_catalog         | pg_default_acl                          | table       | rdsadmin
+ pg_catalog         | pg_depend                               | table       | rdsadmin
+ pg_catalog         | pg_description                          | table       | rdsadmin
+ pg_catalog         | pg_enum                                 | table       | rdsadmin
+ pg_catalog         | pg_event_trigger                        | table       | rdsadmin
+ pg_catalog         | pg_extension                            | table       | rdsadmin
+ pg_catalog         | pg_foreign_data_wrapper                 | table       | rdsadmin
+ pg_catalog         | pg_foreign_server                       | table       | rdsadmin
+ pg_catalog         | pg_foreign_table                        | table       | rdsadmin
+ pg_catalog         | pg_index                                | table       | rdsadmin
+ pg_catalog         | pg_inherits                             | table       | rdsadmin
+ pg_catalog         | pg_init_privs                           | table       | rdsadmin
+ pg_catalog         | pg_language                             | table       | rdsadmin
+ pg_catalog         | pg_largeobject                          | table       | rdsadmin
+ pg_catalog         | pg_largeobject_metadata                 | table       | rdsadmin
+ pg_catalog         | pg_namespace                            | table       | rdsadmin
+ pg_catalog         | pg_opclass                              | table       | rdsadmin
+ pg_catalog         | pg_operator                             | table       | rdsadmin
+ pg_catalog         | pg_opfamily                             | table       | rdsadmin
+ pg_catalog         | pg_parameter_acl                        | table       | rdsadmin
+ pg_catalog         | pg_partitioned_table                    | table       | rdsadmin
+ pg_catalog         | pg_policy                               | table       | rdsadmin
+ pg_catalog         | pg_proc                                 | table       | rdsadmin
+ pg_catalog         | pg_publication                          | table       | rdsadmin
+ pg_catalog         | pg_publication_namespace                | table       | rdsadmin
+ pg_catalog         | pg_publication_rel                      | table       | rdsadmin
+ pg_catalog         | pg_range                                | table       | rdsadmin
+ pg_catalog         | pg_replication_origin                   | table       | rdsadmin
+ pg_catalog         | pg_rewrite                              | table       | rdsadmin
+ pg_catalog         | pg_seclabel                             | table       | rdsadmin
+ pg_catalog         | pg_sequence                             | table       | rdsadmin
+ pg_catalog         | pg_shdepend                             | table       | rdsadmin
+ pg_catalog         | pg_shdescription                        | table       | rdsadmin
+ pg_catalog         | pg_shseclabel                           | table       | rdsadmin
+ pg_catalog         | pg_statistic                            | table       | rdsadmin
+ pg_catalog         | pg_statistic_ext                        | table       | rdsadmin
+ pg_catalog         | pg_statistic_ext_data                   | table       | rdsadmin
+ pg_catalog         | pg_subscription                         | table       | rdsadmin
+ pg_catalog         | pg_subscription_rel                     | table       | rdsadmin
+ pg_catalog         | pg_tablespace                           | table       | rdsadmin
+ pg_catalog         | pg_transform                            | table       | rdsadmin
+ pg_catalog         | pg_trigger                              | table       | rdsadmin
+ pg_catalog         | pg_ts_config                            | table       | rdsadmin
+ pg_catalog         | pg_ts_config_map                        | table       | rdsadmin
+ pg_catalog         | pg_ts_dict                              | table       | rdsadmin
+ pg_catalog         | pg_ts_parser                            | table       | rdsadmin
+ pg_catalog         | pg_ts_template                          | table       | rdsadmin
+ pg_catalog         | pg_type                                 | table       | rdsadmin
+ pg_catalog         | pg_user_mapping                         | table       | rdsadmin
+ pg_toast           | pg_toast_1213                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_1247                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_1255                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_1260                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_1262                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_1417                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_1418                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_14333                          | TOAST table | rdsadmin
+ pg_toast           | pg_toast_14338                          | TOAST table | rdsadmin
+ pg_toast           | pg_toast_14343                          | TOAST table | rdsadmin
+ pg_toast           | pg_toast_14348                          | TOAST table | rdsadmin
+ pg_toast           | pg_toast_18242                          | TOAST table | dbo
+ pg_toast           | pg_toast_18247                          | TOAST table | dbo
+ pg_toast           | pg_toast_18254                          | TOAST table | dbo
+ pg_toast           | pg_toast_18261                          | TOAST table | dbo
+ pg_toast           | pg_toast_2328                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2396                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2600                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2604                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2606                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2609                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2612                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2615                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2618                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2619                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2620                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_2964                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3079                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3118                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3256                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3350                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3381                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3394                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3429                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3456                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3466                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3592                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3596                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_3600                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_6000                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_6100                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_6106                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_6243                           | TOAST table | rdsadmin
+ pg_toast           | pg_toast_826                            | TOAST table | rdsadmin
+ public             | apikeyservice_apikeys_drafts            | table       | dbo
+ public             | cds_model                               | table       | dbo
+ public             | draft_draftadministrativedata           | table       | dbo
+ public             | pneuhage_ecommerce_token_gen_app_apikey | table       | dbo
+(116 rows)
+

@@ -97,3 +97,9 @@ The index.html (in the browse app) is a standalone app container that manages lo
 There is also a Fiori Launchpad Sandbox available. For this, open the flpsandbox.html. Configuration for the FLP is managed in the browse project's ./appconfig folder. Access to this file is enabled in a dedicated Approuter route.
 
 Link to Launchpad: ```https://<your-approuter-domain>/browse/flpsandbox.html```
+
+### SSH (WSL) to PosgreSQL database
+bash for ssh cf: cf ssh ob-apikey-srv -L 15432:postgres-f646c894-8763-4040-979e-35e87114b71a.ce4jcviyvogb.eu-central-1.rds.amazonaws.com:8582
+bash for psql: PGPASSWORD='0582bfc6e1580207b040972fb3' psql \
+  "host=localhost port=15432 dbname=ezjXDyIiacts user=ab1f5e7d2bcf sslmode=require"
+

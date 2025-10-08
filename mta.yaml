@@ -1,10 +1,9 @@
-_schema-version: 3.3.0
+_schema-version: "3.3.0"
 ID: pneu-orderbook-apikey
 version: 1.0.0
 description: "A simple CAP project."
 parameters:
   enable-parallel-deployments: true
-  deploy_mode: html5-repo
 
 build-parameters:
   before-all:
@@ -12,74 +11,70 @@ build-parameters:
       commands:
         - npm ci
         - npx cds build --production
-        # HIER WURDEN DIE ALTEN SQLITE-BEFEHLE ENTFERNT!
 
 modules:
-  # NEUES MODUL: DB Deployment (mit type: nodejs für PostgreSQL)
+  # --- DB-DEPLOYER (PostgreSQL) ---
   - name: ob-apikey-db
-    type: nodejs # Zurück zu nodejs
-    path: srv # WICHTIG: Ändere den Pfad auf das SOURCE-Verzeichnis
+    type: nodejs
+    path: gen/pg
     parameters:
-      # Definiert, dass dieses Modul nur die Migration durchführen soll
-      cds.deploy.config: 
+      buildpack: nodejs_buildpack
+      memory: 256M
+      disk-quota: 256M
+      no-route: true
+      # optional: steuert das Verhalten von cds-deploy über ENV
+      cds.deploy.config:
         kind: deploy-only
         service: orderbookapi-db
-      disk-quota: 256M
-      memory: 256M
-      buildpack: nodejs_buildpack # Expliziter Buildpack-Hint
     build-parameters:
-      # WICHTIG: Wir verwenden einen CUSTOM Builder, um das vollständige NPM-Install
-      # zu überspringen und nur die notwendigen Dateien zu kopieren.
-      builder: custom
-      commands:
-        - "npm prune --production" # Entfernt devDependencies
-        - "npm install --production" # Stellt nur Produktionsabhängigkeiten sicher
-      # Wir ignorieren nur, was wir nicht brauchen.
-      ignore: ["db/**", "app/**", "test/**"] # Ignoriere die Datenbank- und App-Quellen
-      
+      builder: npm
+    provides:
+      - name: db-deploy-done
+        properties:
+          ready: "true"
     requires:
-      - name: orderbookapi-db # Bindet die PostgreSQL-Resource, um die Migration durchzuführen
+      - name: orderbookapi-db
 
-  # SERVICE-MODUL (Startet NUR den Service, keine Migration mehr!)
+  # --- SERVICE (läuft nach erfolgreichem DB-Deploy) ---
   - name: ob-apikey-srv
     type: nodejs
     path: gen/srv
     parameters:
       buildpack: nodejs_buildpack
+      memory: 256M
+      disk-quota: 1024M
       readiness-health-check-type: http
       readiness-health-check-http-endpoint: /health
-      disk-quota: 1024M
-      memory: 256M
     build-parameters:
       builder: npm
     provides:
-      - name: srv-api # required by consumers of CAP services (e.e. approuter)
+      - name: srv-api
         properties:
           srv-url: ${default-url}
     requires:
       - name: orderbookapi-xsuaa
-      # WICHTIG: Service ist nun vom DB-Modul abhängig, um sicherzustellen,
-      # dass die Migration abgeschlossen ist, bevor der Service startet.
-      - name: orderbookapi-db 
-      - name: ob-apikey-db # Stellt sicher, dass das DB-Modul zuerst deployt wird!
+      - name: orderbookapi-db
+      - name: db-deploy-done   # erzwingt Startreihenfolge: DB vor SRV
 
+  # --- APPROUTER ---
   - name: ob-apikey-ar
     type: approuter.nodejs
     path: app/router
     parameters:
       keep-existing-routes: true
-      disk-quota: 1024M
       memory: 256M
+      disk-quota: 1024M
     requires:
       - name: srv-api
         group: destinations
         properties:
-          name: srv-api # must be used in xs-app.json as well
+          name: srv-api
           url: ~{srv-url}
           forwardAuthToken: true
       - name: orderbookapi-xsuaa
       - name: apikey-html5-runtime
 
+  # --- HTML5-CONTENT DEPLOYER ---
   - name: apikey-app-deployer
     type: com.sap.application.content
     path: gen
@@ -90,11 +85,12 @@ modules:
     build-parameters:
       build-result: apps/
       requires:
-        - artifacts:
+        - name: tokenizer
+          artifacts:
             - tokenizer.zip
-          name: tokenizer
           target-path: apps/
 
+  # --- HTML5-APP BUILD ---
   - name: tokenizer
     type: html5
     path: app/tokenizer
@@ -105,23 +101,21 @@ modules:
       commands:
         - npm ci
         - npm run build
-      supported-platforms:
-        []
+      supported-platforms: []
 
 resources:
-  # NEUE RESOURCE: Verweist auf die existierende PostgreSQL-Instanz in der BTP
+  # existierende PostgreSQL-Instanz
   - name: orderbookapi-db
     type: org.cloudfoundry.existing-service
     parameters:
-      # Die Instanz heißt "tokenizer-db"
       service-name: tokenizer-db
 
   - name: orderbookapi-xsuaa
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
-      tenantmode: dedicated
       service-plan: application
+      tenantmode: dedicated
       service-name: orderbookapi-xsuaa
 
   - name: apikey-html5-repo-host
@@ -129,6 +123,7 @@ resources:
     parameters:
       service: html5-apps-repo
       service-plan: app-host
+
   - name: apikey-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
