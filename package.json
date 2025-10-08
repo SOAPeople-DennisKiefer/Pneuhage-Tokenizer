@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "cds-serve",
-    "db:init:local": "npx cds deploy --to pg --with-mocks",
+    "db:init:local": "npx cds deploy --to postgres --with-mocks",
     "start:local": "cds run",
     "build:mta": "mbt build -t gen --mtar mta.tar",
     "deploy:sqlite": "cds deploy --to sqlite --with-mocks",
@@ -37,25 +37,22 @@
   "cds": {
     "requires": {
       "db": {
-        "kind": "sql",
-        "adapter": "pg",
+        "kind": "postgres",
+        "impl": "@cap-js/postgres",
         "deployment": "@cap-js/postgres",
         "model": [
           "db",
           "srv"
         ],
-        "production": {
-          "adapter": "pg"
+        "credentials": {
+          "host": "localhost",
+          "port": 5432,
+          "user": "localuser",
+          "password": "localpassword",
+          "database": "localdb"
         },
-        "development": {
-          "adapter": "pg",
-          "credentials": {
-            "host": "localhost",
-            "port": 5432,
-            "user": "localuser",
-            "password": "localpassword",
-            "database": "localdb"
-          }
+        "production": {
+          "kind": "postgres"
         }
       },
       "auth": {
