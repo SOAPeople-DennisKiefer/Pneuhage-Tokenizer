@@ -14,6 +14,16 @@ For this, we need
     - hosted in a HTML5 Repository Service on BTP
     - An index.html as container for the UI5 app's component
 
+## Local PostgreSQL Setup
+
+To initialize the local PostgreSQL schema that is used during development, make sure the `@cap-js/postgres` package is installed (`npm install` from the project root) and run:
+
+```bash
+npm run db:init:local
+```
+
+The command deploys the CDS model to the PostgreSQL instance configured in `package.json` (default: `localhost:5432`, database `localdb`). Adjust the credentials there or provide them via environment variables before executing the command.
+
 ## Architecture Overview
 ![External image from SAP - Architecture Overview](https://user-images.githubusercontent.com/7225881/199363555-10de43ac-80c9-493f-b849-b7675b7c1df3.png)
 (Source: https://github.com/SAP-samples/ui5-deployments/blob/main/README.md)
