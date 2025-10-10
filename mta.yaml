@@ -25,7 +25,7 @@ modules:
       # optional: steuert das Verhalten von cds-deploy über ENV
       cds.deploy.config:
         kind: deploy-only
-        service: orderbookapi-db
+        service: tokenizer-db
     build-parameters:
       builder: npm
     provides:
@@ -33,7 +33,7 @@ modules:
         properties:
           ready: "true"
     requires:
-      - name: orderbookapi-db
+      - name: tokenizer-db
 
   # --- SERVICE (läuft nach erfolgreichem DB-Deploy) ---
   - name: ob-apikey-srv
@@ -53,8 +53,8 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: orderbookapi-xsuaa
-      - name: orderbookapi-db
-      - name: db-deploy-done   # erzwingt Startreihenfolge: DB vor SRV
+      - name: tokenizer-db
+      - name: db-deploy-done    # erzwingt Startreihenfolge: DB vor SRV
 
   # --- APPROUTER ---
   - name: ob-apikey-ar
@@ -83,12 +83,11 @@ modules:
         parameters:
           content-target: true
     build-parameters:
-      build-result: apps/
       requires:
         - name: tokenizer
           artifacts:
-            - tokenizer.zip
-          target-path: apps/
+            - tokenizer # <-- KORREKTUR: Ohne die Endung '.zip'
+          target-path: resources/
 
   # --- HTML5-APP BUILD ---
   - name: tokenizer
@@ -102,10 +101,14 @@ modules:
         - npm ci
         - npm run build
       supported-platforms: []
+      # NEUE SEKTION: Definiert das Artefakt, das an den Deployer übergeben wird
+      artifacts:
+        - name: tokenizer.zip  # <--- Wichtig: Den fertigen Zieldateinamen definieren
+          path: dist
 
 resources:
   # existierende PostgreSQL-Instanz
-  - name: orderbookapi-db
+  - name: tokenizer-db
     type: org.cloudfoundry.existing-service
     parameters:
       service-name: tokenizer-db
