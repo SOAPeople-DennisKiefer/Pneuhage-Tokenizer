@@ -103,3 +103,23 @@ bash for ssh cf: cf ssh ob-apikey-srv -L 15432:postgres-f646c894-8763-4040-979e-
 bash for psql: PGPASSWORD='0582bfc6e1580207b040972fb3' psql \
   "host=localhost port=15432 dbname=ezjXDyIiacts user=ab1f5e7d2bcf sslmode=require"
 
+
+  // --- Lokal entwickeln ---
+  "start": "cds run",
+  "start:watch": "cds watch",
+
+  // DB nur lokal aktualisieren (verbindet auf Postgres, NICHT sqlite)
+  "db:deploy:local": "cds deploy --to postgres",
+
+  // --- Cloud Foundry / BTP ---
+  // Voller Deploy (inkl. Tasks; führt den DB-Deployer-Task aus -> Schema/Data in PG)
+  "build": "cds build --production",
+  "build:mta": "mbt build -t gen --mtar mta.tar",
+  "deploy:cf:all": "npm run build && npm run build:mta && cf deploy gen/mta.tar",
+
+  // App deployen OHNE DB anzufassen (überspringt alle im MTA definierten Tasks)
+  "deploy:cf:app": "npm run build && npm run build:mta && cf deploy gen/mta.tar --skip-tasks",
+
+  // Nur DB auf CF neu deployen (ohne App neu zu bauen/pushen)
+  // Triggert den Deployer noch einmal als CF-Task; 'cds-deploy' ist dein Startkommando
+  "db:deploy:cf": "cf run-task ob-apikey-db \"cds-deploy\" -k 256M -m 256M"

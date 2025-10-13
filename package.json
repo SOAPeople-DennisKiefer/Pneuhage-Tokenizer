@@ -17,20 +17,19 @@
   "devDependencies": {
     "@cap-js/cds-types": "^0.7.0",
     "@sap/cds-dk": "^8",
-    "@cap-js/sqlite": "^1",
-    "rimraf": "^6.0.1",
-    "sqlite3": "^5"
+    "rimraf": "^6.0.1"
   },
   "scripts": {
-    "start": "cds-serve",
-    "db:init:local": "npx cds deploy --to postgres --with-mocks",
-    "start:local": "cds run",
-    "build:mta": "mbt build -t gen --mtar mta.tar",
-    "deploy:sqlite": "cds deploy --to sqlite --with-mocks",
-    "deploy:cf": "cf deploy gen/mta.tar",
-    "build": "cds build --production",
-    "deploy:cf:update": "npm run build && npm run build:mta && npm run deploy:cf"
-  },
+  "start": "cds run",
+  "start:watch": "cds watch",
+  "db:deploy:local": "cds deploy --to postgres",
+  "build": "cds build --production",
+  "build:mta": "mbt build -t gen --mtar mta.tar",
+  "deploy:cf:all": "npm run build && npm run build:mta && cf deploy gen/mta.tar",
+  "deploy:cf:app": "npm run build && npm run build:mta && cf deploy gen/mta.tar --skip-tasks",
+  "db:deploy:cf": "cf run-task ob-apikey-db \"cds-deploy\" -k 256M -m 256M"
+}
+,
   "sapux": [
     "app/tokenizer"
   ],
