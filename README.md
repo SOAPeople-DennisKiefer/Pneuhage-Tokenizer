@@ -1,125 +1,91 @@
-## You can find the online-documentation for the Tokenizer app here: here 📖[Tokenizer Docu](https://soapeople-denniskiefer.github.io/pneuhage-tokenizer/)
+# Pneuhage Tokenizer
 
+You can find the online documentation for the Tokenizer application here: [Tokenizer Docu](https://soapeople-denniskiefer.github.io/pneuhage-tokenizer/)
 
+## Database Connectivity via Service Bindings
 
-# Deploying an SAP CAP Backend with Fiori UI to SAP BTP Cloud Foundry
+The application connects to PostgreSQL exclusively through [SAP BTP service bindings](https://cap.cloud.sap/docs/advanced/hybrid-testing#service-bindings). No database credentials are stored in the repository anymore.  This keeps the code base identical across **DEV**, **QAS**, and **PRD** while allowing each space to bind to the appropriate database instance.
 
-## Introduction
-We want to deploy a SAP CAP application with its Fiori UI as a standalone application to SAP BTP.
-For this, we need
-- a dedicated SAP Approuter
-    - with route configurations for the service and the UI app
-- the deployed CAP backend service
-- the Fiori UI app
-    - hosted in a HTML5 Repository Service on BTP
-    - An index.html as container for the UI5 app's component
+### Cloud Foundry Setup
 
-## Local PostgreSQL Setup
+1. **Create (or identify) the PostgreSQL service instances**
+   - DEV & QAS share a single instance, for example `tokenizer-shared-db`.
+   - PRD uses its own instance, for example `tokenizer-prd-db`.
+2. **Bind the instances to the MTA modules**
+   - The `mta.yaml` declares the resource `orderbookapi-db` as an `existing-service`. By default it expects the instance name `tokenizer-db`.
+   - To target the correct instance per space without touching the application code, provide MTA extension descriptors (one per landscape):
 
-To initialize the local PostgreSQL schema that is used during development, make sure the `@cap-js/postgres` package is installed (`npm install` from the project root) and run:
+     ```yaml
+     # mta.dev.mtaext (DEV space, shares DB with QAS)
+     _schema-version: "3.1"
+     ID: pneu-orderbook-apikey-dev
+     extends: pneu-orderbook-apikey
+     resources:
+       - name: orderbookapi-db
+         parameters:
+           service-name: tokenizer-shared-db
 
-```bash
-npm run db:init:local
-```
+     # mta.qas.mtaext (QAS space, same DB as DEV)
+     _schema-version: "3.1"
+     ID: pneu-orderbook-apikey-qas
+     extends: pneu-orderbook-apikey
+     resources:
+       - name: orderbookapi-db
+         parameters:
+           service-name: tokenizer-shared-db
 
-The command deploys the CDS model to the PostgreSQL instance configured in `package.json` (default: `localhost:5432`, database `localdb`). Adjust the credentials there or provide them via environment variables before executing the command.
+     # mta.prd.mtaext (PRD space, dedicated DB)
+     _schema-version: "3.1"
+     ID: pneu-orderbook-apikey-prd
+     extends: pneu-orderbook-apikey
+     resources:
+       - name: orderbookapi-db
+         parameters:
+           service-name: tokenizer-prd-db
+     ```
 
-## Architecture Overview
-![External image from SAP - Architecture Overview](https://user-images.githubusercontent.com/7225881/199363555-10de43ac-80c9-493f-b849-b7675b7c1df3.png)
-(Source: https://github.com/SAP-samples/ui5-deployments/blob/main/README.md)
+     Deploy with `cf deploy gen/mta.tar -e mta.dev.mtaext` (or `.qas`, `.prd` respectively). The extension files keep the versioned `mta.yaml` untouched while letting each space bind to the correct database instance.
+3. **Deploy the MTA**
 
-## Explanation of mta.yaml Parameters
-### 1. build-result (in HTML5 Modules):
+   ```bash
+   npm run build
+   npm run build:mta
+   cf deploy gen/mta.tar -e mta.<landscape>.mtaext
+   ```
+   The CAP runtime now resolves the bound service from `VCAP_SERVICES` (label `postgresql-db`).
 
-- Specifies the output directory created by the build command where the app’s static files are generated.
-- In your mta.yaml, each HTML5 module (bookshopadminbooks and bookshopbrowse) has build-result: dist, meaning the dist folder will contain the built HTML5 app files (like index.html, JavaScript, and CSS).
-- The deployer module (bookshop-app-deployer) references this dist directory when it packages the HTML5 app into .zip archives (admin-books.zip and browse.zip).
+### Local Development
 
-### 2. target-path (in the Deployer Module):
+Local development can also use bindings without storing credentials in the repository:
 
-- Specifies the location within the HTML5 repository where the deployer should place each app after uploading.
-- In your configuration, both admin-books.zip and browse.zip will be deployed to the apps/ directory under target-path: apps/.
-- The target-path helps determine the final URL path you’ll use to access these apps within the HTML5 repository.
+1. Create a service key for the shared PostgreSQL instance (`tokenizer-shared-db` in the example above):
+   ```bash
+   cf create-service-key tokenizer-shared-db dev-key
+   ```
+2. Download the credentials once to your machine:
+   ```bash
+   cf service-key tokenizer-shared-db dev-key > local-service-key.json
+   ```
+3. Register the key with CAP (stored in `~/.cds-services.json`):
+   ```bash
+   cds bind -2 local-service-key.json --to db
+   ```
+4. Start the application locally:
+   ```bash
+   npm start
+   ```
 
-### 3. name (in the Deployer Module):
+This workflow keeps secrets out of source control while still enabling local development.
 
-- This name identifies the HTML5 app in the repository and serves as a prefix in the URL for your AppRouter routes.
-- In your configuration, bookshopadminbooks and bookshopbrowse are used as app identifiers, and they will appear as part of the path in AppRouter’s xs-app.json routes.
+## Deployment Scripts
 
-## Configuring Routes in xs-app.json
-To serve each app as a standalone app with its own route, your AppRouter’s xs-app.json configuration should look like this:
+Useful npm scripts remain unchanged and can be executed from the project root:
 
-**Example xs-app.json**`
+- `npm run start` – run the CAP service locally.
+- `npm run start:watch` – run with live reload.
+- `npm run db:deploy:local` – deploy the CDS model to the bound PostgreSQL instance.
+- `npm run deploy:cf:all` – build the project, create the MTA, and deploy all modules including the database deployer task.
+- `npm run deploy:cf:app` – deploy application modules without running database tasks.
+- `npm run db:deploy:cf` – re-run the database deployer task in Cloud Foundry.
 
-For bookshopbrowse:
-
-```json
-{
-  "source": "^/bookshopbrowse/(.*)$",
-  "target": "/bookshopbrowse/$1",
-  "service": "html5-apps-repo-rt",
-  "authenticationType": "xsuaa"
-}
-```
-For bookshopadminbooks:
-
-```json
-{
-  "source": "^/bookshopadminbooks/(.*)$",
-  "target": "/bookshopadminbooks/$1",
-  "service": "html5-apps-repo-rt",
-  "authenticationType": "xsuaa"
-}
-```
-
-- source: Defines the path your users will use to access the app, e.g., /bookshopbrowse or /bookshopadminbooks. The (.*) part allows for forwarding all subsequent paths (like /index.html or /other.html).
-- target: Specifies the route in the HTML5 repository. /bookshopbrowse/$1 directs requests to the bookshopbrowse app's content in the HTML5 repository.
-- service: html5-apps-repo-rt is the HTML5 repository runtime service, allowing AppRouter to retrieve the app’s content.
-
-## Deployment
-A full build and deployment cycle from the MTA descriptor can be done by running the script deploy:mta from the overall project's descriptor package.json. This will deploy the AppRouter and the two frontend apps.
-
-```bash
-npm run deploy:mta
-```
-
-## Accessing the App
-After deployment, the routes in xs-app.json will let users access the apps by going to URLs like:
-- ```https://<your-approuter-domain>/browse/index.html```
-- ```https://<your-approuter-domain>/bookshopadminbooks/index.html```
-
-Each route points to the respective HTML5 app’s content in the HTML5 repository as configured by the name and target-path in the mta.yaml deployer module.
-
-### Standalone App
-The index.html (in the browse app) is a standalone app container that manages loading the required libs using the script from ./utils/locate-reuse-libs.js and then loads the component into the content area.
-
-### Fiori Launchpad Sandbox
-There is also a Fiori Launchpad Sandbox available. For this, open the flpsandbox.html. Configuration for the FLP is managed in the browse project's ./appconfig folder. Access to this file is enabled in a dedicated Approuter route.
-
-Link to Launchpad: ```https://<your-approuter-domain>/browse/flpsandbox.html```
-
-### SSH (WSL) to PosgreSQL database
-bash for ssh cf: cf ssh ob-apikey-srv -L 15432:postgres-f646c894-8763-4040-979e-35e87114b71a.ce4jcviyvogb.eu-central-1.rds.amazonaws.com:8582
-bash for psql: PGPASSWORD='0582bfc6e1580207b040972fb3' psql \
-  "host=localhost port=15432 dbname=ezjXDyIiacts user=ab1f5e7d2bcf sslmode=require"
-
-
-  // --- Lokal entwickeln ---
-  "start": "cds run",
-  "start:watch": "cds watch",
-
-  // DB nur lokal aktualisieren (verbindet auf Postgres, NICHT sqlite)
-  "db:deploy:local": "cds deploy --to postgres",
-
-  // --- Cloud Foundry / BTP ---
-  // Voller Deploy (inkl. Tasks; führt den DB-Deployer-Task aus -> Schema/Data in PG)
-  "build": "cds build --production",
-  "build:mta": "mbt build -t gen --mtar mta.tar",
-  "deploy:cf:all": "npm run build && npm run build:mta && cf deploy gen/mta.tar",
-
-  // App deployen OHNE DB anzufassen (überspringt alle im MTA definierten Tasks)
-  "deploy:cf:app": "npm run build && npm run build:mta && cf deploy gen/mta.tar --skip-tasks",
-
-  // Nur DB auf CF neu deployen (ohne App neu zu bauen/pushen)
-  // Triggert den Deployer noch einmal als CF-Task; 'cds-deploy' ist dein Startkommando
-  "db:deploy:cf": "cf run-task ob-apikey-db \"cds-deploy\" -k 256M -m 256M"
+For more detailed functional information please consult the [Tokenizer documentation](https://soapeople-denniskiefer.github.io/pneuhage-tokenizer/).
