@@ -1,91 +1,55 @@
 # Pneuhage Tokenizer
 
-You can find the online documentation for the Tokenizer application here: [Tokenizer Docu](https://soapeople-denniskiefer.github.io/pneuhage-tokenizer/)
+## Overview
+The Pneuhage Tokenizer is a microservice within the Pneuhage eCommerce API landscape. Every external request that reaches the eCommerce API must include an API key. The API forwards this key to the Tokenizer, which validates the credential and returns the debitor number that is authorized for the call. The API can then continue processing the request with full knowledge of the responsible debitor.
 
-## Database Connectivity via Service Bindings
+Besides runtime validation, the Tokenizer provides maintenance capabilities for API credentials. Authorized users can create, edit, and delete API keys and assign each key to exactly one debitor number. Any changes are persisted in the PostgreSQL database so that the next validation cycle reflects the latest assignments.
 
-The application connects to PostgreSQL exclusively through [SAP BTP service bindings](https://cap.cloud.sap/docs/advanced/hybrid-testing#service-bindings). No database credentials are stored in the repository anymore.  This keeps the code base identical across **DEV**, **QAS**, and **PRD** while allowing each space to bind to the appropriate database instance.
+## Key Capabilities
+- **API key validation** for every eCommerce API request, including a debitor lookup to route downstream processing.
+- **Credential lifecycle management** allowing administrators to manage the pool of valid API keys and their one-to-one debitor assignments.
+- **Secure PostgreSQL integration** using service bindings to keep credentials out of source control.
+- **Cloud Foundry ready** multi-target application (MTA) deployment that aligns with Pneuhage delivery processes.
 
-### Cloud Foundry Setup
+## Application Structure
+The repository follows the standard SAP Cloud Application Programming Model (CAP) layout:
 
-1. **Create (or identify) the PostgreSQL service instances**
-   - DEV & QAS share a single instance, for example `tokenizer-shared-db`.
-   - PRD uses its own instance, for example `tokenizer-prd-db`.
-2. **Bind the instances to the MTA modules**
-   - The `mta.yaml` declares the resource `orderbookapi-db` as an `existing-service`. By default it expects the instance name `tokenizer-db`.
-   - To target the correct instance per space without touching the application code, provide MTA extension descriptors (one per landscape):
+```text
+├── app/                  # SAPUI5 application for maintaining API keys
+├── db/                   # CDS data model and database artefacts
+├── docs/                 # Generated documentation for the project
+├── srv/                  # CAP service handlers (API key validation logic)
+├── top/                  # Deployment assets (e.g., multitarget application setup)
+├── development.env       # Local environment variable template
+├── mta.yaml              # Base MTA descriptor
+├── package.json          # Project metadata and NPM scripts
+└── xs-security.json      # XSUAA security descriptor
+```
 
-     ```yaml
-     # mta.dev.mtaext (DEV space, shares DB with QAS)
-     _schema-version: "3.1"
-     ID: pneu-orderbook-apikey-dev
-     extends: pneu-orderbook-apikey
-     resources:
-       - name: orderbookapi-db
-         parameters:
-           service-name: tokenizer-shared-db
+Additional helper files (e.g. `tests.http`) are available for manual testing of the service endpoints.
 
-     # mta.qas.mtaext (QAS space, same DB as DEV)
-     _schema-version: "3.1"
-     ID: pneu-orderbook-apikey-qas
-     extends: pneu-orderbook-apikey
-     resources:
-       - name: orderbookapi-db
-         parameters:
-           service-name: tokenizer-shared-db
+## Working with the Database
+Database connectivity relies on SAP BTP service bindings for PostgreSQL. DEV and QAS share a single instance that is referenced by the `tokenizer-db` resource, while PRD is wired to its own dedicated instance via the corresponding extension descriptor. No credentials are checked into the repository, which means the same code runs across all landscapes without code changes.
 
-     # mta.prd.mtaext (PRD space, dedicated DB)
-     _schema-version: "3.1"
-     ID: pneu-orderbook-apikey-prd
-     extends: pneu-orderbook-apikey
-     resources:
-       - name: orderbookapi-db
-         parameters:
-           service-name: tokenizer-prd-db
-     ```
+Local development is currently out of scope. All interaction with the Tokenizer happens in the Cloud Foundry landscapes described above.
 
-     Deploy with `cf deploy gen/mta.tar -e mta.dev.mtaext` (or `.qas`, `.prd` respectively). The extension files keep the versioned `mta.yaml` untouched while letting each space bind to the correct database instance.
-3. **Deploy the MTA**
+## Deployment
+All deployments start with the scripts defined in `package.json`. Use the combinations below depending on the desired outcome:
 
-   ```bash
-   npm run build
-   npm run build:mta
-   cf deploy gen/mta.tar -e mta.<landscape>.mtaext
-   ```
-   The CAP runtime now resolves the bound service from `VCAP_SERVICES` (label `postgresql-db`).
+| Goal | Script sequence | Result |
+| --- | --- | --- |
+| **Create `ob-apikey-db` and deploy the schema for the first time** | `npm run build` → `npm run build:mta` → `cf deploy gen/mta.tar -m ob-apikey-db` | Generates the deployer module, pushes the `ob-apikey-db` application, and runs `cds-deploy` to create the initial PostgreSQL schema. |
+| **Deploy the HTML5 and service applications without touching the database** | `npm run deploy:cf:app` | Packages the MTA and deploys the approuter, HTML5 content deployer, and CAP service while skipping the `ob-apikey-db` module. |
+| **Deploy the full application including database and UI together** | `npm run deploy:cf:all` | Builds the project, creates the MTA archive, and deploys every module so that the latest database model and application artefacts reach the target landscape in one run. |
+| **Re-run the database deployer after the app already exists** | `npm run db:deploy:cf` | Executes `cf run-task ob-apikey-db "cds-deploy"` to apply CDS model changes to PostgreSQL without re-deploying the UI or service modules. |
 
-### Local Development
+During each deployment, provide the correct extension descriptor (e.g., `mta.dev.mtaext`, `mta.qas.mtaext`, or `mta.prd.mtaext`) so that the `tokenizer-db` resource binds to the appropriate PostgreSQL instance.
 
-Local development can also use bindings without storing credentials in the repository:
+## Relation to the Pneuhage eCommerce API
+The Tokenizer acts as the trust anchor for the Pneuhage eCommerce API. The API delegates API-key validation to this service, which, in turn, manages the list of valid keys and their one-to-one mapping to debitor numbers. Upon successful validation, the Tokenizer returns the debitor number to the API so that the request can be executed in the correct business context.
 
-1. Create a service key for the shared PostgreSQL instance (`tokenizer-shared-db` in the example above):
-   ```bash
-   cf create-service-key tokenizer-shared-db dev-key
-   ```
-2. Download the credentials once to your machine:
-   ```bash
-   cf service-key tokenizer-shared-db dev-key > local-service-key.json
-   ```
-3. Register the key with CAP (stored in `~/.cds-services.json`):
-   ```bash
-   cds bind -2 local-service-key.json --to db
-   ```
-4. Start the application locally:
-   ```bash
-   npm start
-   ```
+## Additional Resources
+- Project documentation: <https://soapeople-denniskiefer.github.io/pneuhage-tokenizer/>
+- CAP documentation: <https://cap.cloud.sap>
+- PostgreSQL service bindings: <https://cap.cloud.sap/docs/advanced/hybrid-testing#service-bindings>
 
-This workflow keeps secrets out of source control while still enabling local development.
-
-## Deployment Scripts
-
-Useful npm scripts remain unchanged and can be executed from the project root:
-
-- `npm run start` – run the CAP service locally.
-- `npm run start:watch` – run with live reload.
-- `npm run db:deploy:local` – deploy the CDS model to the bound PostgreSQL instance.
-- `npm run deploy:cf:all` – build the project, create the MTA, and deploy all modules including the database deployer task.
-- `npm run deploy:cf:app` – deploy application modules without running database tasks.
-- `npm run db:deploy:cf` – re-run the database deployer task in Cloud Foundry.
-
-For more detailed functional information please consult the [Tokenizer documentation](https://soapeople-denniskiefer.github.io/pneuhage-tokenizer/).
