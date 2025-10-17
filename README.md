@@ -38,9 +38,13 @@ All deployments start with the scripts defined in `package.json`. Use the combin
 
 | Goal | Script sequence | Result |
 | --- | --- | --- |
+
 | **Create `ob-apikey-db` and deploy the schema for the first time** | `npm run build` → `npm run build:mta` → `cf deploy gen/mta.tar -m ob-apikey-db` | Generates the deployer module, pushes the `ob-apikey-db` application, and runs `cds-deploy` to create the initial PostgreSQL schema. |
+
 | **Deploy the HTML5 and service applications without touching the database** | `npm run deploy:cf:app` | Packages the MTA and deploys the approuter, HTML5 content deployer, and CAP service while skipping the `ob-apikey-db` module. |
+
 | **Deploy the full application including database and UI together** | `npm run deploy:cf:all` | Builds the project, creates the MTA archive, and deploys every module so that the latest database model and application artefacts reach the target landscape in one run. |
+
 | **Re-run the database deployer after the app already exists** | `npm run db:deploy:cf` | Executes `cf run-task ob-apikey-db "cds-deploy"` to apply CDS model changes to PostgreSQL without re-deploying the UI or service modules. |
 
 During each deployment, provide the correct extension descriptor (e.g., `mta.dev.mtaext`, `mta.qas.mtaext`, or `mta.prd.mtaext`) so that the `tokenizer-db` resource binds to the appropriate PostgreSQL instance.
